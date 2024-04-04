@@ -37,8 +37,6 @@ class Database implements DatabaseInterface
             if ('}' === $query[$i]) {
                 $inBlock = false;
 
-
-
                 if (str_contains($this->blocks[$this->actualBlock]['chunk'], 'block = 1')) {
                     $newQuery .= $this->blocks[$this->actualBlock]['chunk'];
                 }
