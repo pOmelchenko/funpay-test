@@ -28,11 +28,11 @@ function buildQuery(string $query, array $args = []): string
 
 function buildArray($args) {
     if (!array_is_list($args)) {
-        $result = [];
-        foreach ($args as $k => $v) {
-            $result[] = "`$k` = ".getval($v);
-        }
-        return implode(", ",$result);
+        $args = array_map(
+            fn ($k, $v) => "`$k` = ".getval($v),
+            array_keys($args),
+            array_values($args)
+        );
     }
     return implode(", ", $args);
 }
