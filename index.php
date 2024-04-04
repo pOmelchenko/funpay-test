@@ -6,13 +6,13 @@ function buildQuery(string $query, array $args = []): string
 
     $res = '';
 
-    for ($i = 0; $i < strlen($query); $i++) {
+    for ($i = 0; $i < mb_strlen($query); $i++) {
         if ($query[$i] === '?') {
             $res .= match ($query[$i + 1]) {
                 'd' => (int) array_shift($args),
                 'f' => (float) array_shift($args),
                 'a' => '',
-                '#' => "'" . implode("', '", (array) array_shift($args)) . "'",
+                '#' => '`' . implode('`, `', (array) array_shift($args)) . '`',
                 ' ' => "'" . array_shift($args) . "'",
                 default => $query[$i],
             };
@@ -27,7 +27,7 @@ function buildQuery(string $query, array $args = []): string
 }
 
 
-echo buildQuery('SELECT name FROM users WHERE user_id = 1');
+echo buildQuery('SELECT name FROM users WHERE user_id = asd');
 
 echo PHP_EOL;
 
