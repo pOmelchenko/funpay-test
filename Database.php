@@ -63,6 +63,6 @@ class Database implements DatabaseInterface
 
     public function skip()
     {
-        throw new Exception();
+//        throw new Exception();
     }
 }

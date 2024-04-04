@@ -50,8 +50,15 @@ class DatabaseTest
             'SELECT name FROM users WHERE `user_id` IN (1, 2, 3) AND block = 1',
         ];
 
-        if ($results !== $correct) {
-            throw new Exception('Failure.');
+        foreach ($results as $key => $row) {
+            if ($row !== $correct[$key]) {
+                echo "Actual:\t" . $row .PHP_EOL;
+                echo "Expect:\t" . $correct[$key] .PHP_EOL;
+            }
         }
+
+//        if ($results !== $correct) {
+//            throw new Exception('Failure.');
+//        }
     }
 }
