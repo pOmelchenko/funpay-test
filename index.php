@@ -8,15 +8,15 @@ function buildQuery(string $query, array $args = []): string
 
     for ($i = 0; $i < strlen($query); $i++) {
         if ($query[$i] === '?') {
-            $res .= match ([$query[$i], $query[$i + 1]]) {
-                ['?', 'd'] => (int) array_shift($args),
-                ['?', 'f'] => (float) array_shift($args),
-                ['?', 'a'] => '',
-                ['?', '#'] => "'" . implode("', '", (array) array_shift($args)) . "'",
-                ['?', ' '] => "'" . array_shift($args) . "'",
+            $res .= match ($query[$i + 1]) {
+                'd' => (int) array_shift($args),
+                'f' => (float) array_shift($args),
+                'a' => '',
+                '#' => "'" . implode("', '", (array) array_shift($args)) . "'",
+                ' ' => "'" . array_shift($args) . "'",
                 default => $query[$i],
             };
-            if ($query[$i + 1] !== ' ') $i++;
+            $query[$i + 1] !== ' ' && $i++;
         } else {
             $res .= $query[$i];
         }
