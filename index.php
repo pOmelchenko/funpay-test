@@ -30,11 +30,11 @@ function buildArray($args) {
     if (!array_is_list($args)) {
         $result = [];
         foreach ($args as $k => $v) {
-            $result[] = "`$k`=".getval($v);
+            $result[] = "`$k` = ".getval($v);
         }
-        return implode(",",$result);
+        return implode(", ",$result);
     }
-    return implode(",", $args);
+    return implode(", ", $args);
 }
 
 function getval($arg):string {
@@ -68,3 +68,9 @@ echo buildQuery(
     'UPDATE users SET ?a WHERE user_id = -1',
     [['name' => 'Jack', 'email' => null]]
 );
+
+//  UPDATE users SET `name`='Jack',`email`= NULL WHERE user_id = -1
+//  UPDATE users SET `name` = 'Jack',`email` =  NULL WHERE user_id = -1
+//  UPDATE users SET `name` = 'Jack', `email` =  NULL WHERE user_id = -1
+//  UPDATE users SET `name` = 'Jack', `email` = NULL WHERE user_id = -1
+// 'UPDATE users SET `name` = 'Jack', `email` = NULL WHERE user_id = -1',
