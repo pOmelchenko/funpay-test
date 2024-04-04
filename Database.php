@@ -9,6 +9,9 @@ class Database implements DatabaseInterface
 {
     private mysqli $mysqli;
 
+    private int $actualBlock = 0;
+    private array $blocks = [];
+
     public function __construct(mysqli $mysqli)
     {
         $this->mysqli = $mysqli;
@@ -16,13 +19,36 @@ class Database implements DatabaseInterface
 
     public function buildQuery(string $query, array $args = []): string
     {
-        if ([] === $args) return $query;
+        if ([] === $args) {
+            return $query;
+        }
 
-        $res = '';
+        $newQuery = '';
+        $inBlock = false;
 
-        for ($i = 0; $i < strlen($query); $i++) {
-            if ($query[$i] === '?') {
-                $res .= match ($query[$i + 1]) {
+        for ($i = 0, $iMax = strlen($query); $i < $iMax; $i++) {
+            $chunk = '';
+            if ('{' === $query[$i]) {
+                $inBlock = true;
+                $this->blocks[$this->actualBlock]['chunk'] = '';
+                continue;
+            }
+
+            if ('}' === $query[$i]) {
+                $inBlock = false;
+
+
+
+                if (str_contains($this->blocks[$this->actualBlock]['chunk'], 'block = 1')) {
+                    $newQuery .= $this->blocks[$this->actualBlock]['chunk'];
+                }
+
+                $this->actualBlock++;
+                continue;
+            }
+
+            if ('?' === $query[$i]) {
+                $chunk .= match ($query[$i + 1]) {
                     'd' => (int) array_shift($args),
                     'f' => (float) array_shift($args),
                     'a' => $this->buildArray(array_shift($args)),
@@ -30,14 +56,19 @@ class Database implements DatabaseInterface
                     ' ' => "'" . array_shift($args) . "'",
                     default => $query[$i],
                 };
-                $query[$i + 1] !== ' ' && $i++;
+                ' ' !== $query[$i + 1] && $i++;
             } else {
-                $res .= $query[$i];
+                $chunk .= $query[$i];
             }
 
+            if ($inBlock) {
+                $this->blocks[$this->actualBlock]['chunk'] .= $chunk;
+            } else {
+                $newQuery .= $chunk;
+            }
         }
 
-        return $res;
+        return $newQuery;
     }
 
     private function buildArray($args): string
@@ -56,13 +87,13 @@ class Database implements DatabaseInterface
     {
         return match (gettype($arg)) {
             'string' => "'$arg'",
-            'NULL'=> 'NULL',
+            'NULL' => 'NULL',
             default => $arg,
         };
     }
 
     public function skip()
     {
-//        throw new Exception();
+        return false;
     }
 }
